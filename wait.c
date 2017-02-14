@@ -73,6 +73,7 @@ int kwait(int *status)
                 //ZOMBIE child process found
                 found_proc = removeFromList(&readyQueue);
                 found_proc->status = FREE;
+                printf("Process %d exited with value %d\n", found_proc->pid, found_proc->exitCode);
                 put_proc(&freeList, found_proc);
             }
         }
