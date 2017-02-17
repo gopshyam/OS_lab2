@@ -20,6 +20,8 @@ typedef struct proc{
     int    event;
     int    exitCode;
     int    kstack[SSIZE];      // per proc stack area
+    char   name[32];
+    int    inUmode;
 }PROC;
 
 PROC proc[NPROC], *running, *freeList, *readyQueue, *sleepList;
@@ -30,12 +32,16 @@ extern int color;
 #include "queue.c"
 #include "wait.c"
 #include "kernel.c"
+#include "u1.c"
+
+char *pname[]={"Sun", "Mercury", "Venus", "Earth",  "Mars", "Jupiter", "Saturn", "Uranus", "Neptune" };
 
 int init()
 {
     PROC *p;
     int i;
 
+    color = 0x0C;
     printf("init ....");
 
     for (i=0; i<NPROC; i++){   // initialize all procs
@@ -43,7 +49,9 @@ int init()
            p->pid = i;
            p->status = FREE;
            p->priority = 0;     
+           p->inUmode = 0;
            p->next = &proc[i+1];
+           strcpy(proc[i].name, pname[i]);
     }
     freeList = &proc[0];      // all procs are in freeList
     proc[NPROC-1].next = 0;
@@ -67,7 +75,7 @@ int scheduler()
   }
   running = dequeue(&readyQueue);
   running->status = RUNNING;
-  color = 0x000A + (running->pid % 6);
+  color = running->pid + 0x0A;
   //rflag = 0;
 
 }

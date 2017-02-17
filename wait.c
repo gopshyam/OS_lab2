@@ -62,23 +62,24 @@ int kwait(int *status)
     // YOUR kwait function
     int i;
     int num_children = 0;
-    int pid = running->pid;
+    int rpid = running->pid;
     PROC *p;
     PROC *found_proc;
     for (i=1; i<NPROC; i++) {
         p = &proc[i];
-        if (p->ppid == pid) {
+        if (proc[i].ppid == rpid) {
             num_children++;
-            if (p->status == ZOMBIE)  {
+            if (proc[i].status == ZOMBIE)  {
                 //ZOMBIE child process found
-                found_proc = removeFromList(&readyQueue);
+                num_children--;
+                found_proc = removeFromList(&readyQueue, p);
                 found_proc->status = FREE;
-                printf("Process %d exited with value %d\n", found_proc->pid, found_proc->exitCode);
-                put_proc(&freeList, found_proc);
+                printf("Process %d exited with value %d\n", proc[i].pid, proc[i].exitCode);
+                put_proc(&freeList, p);
             }
         }
     }
     if (num_children > 0) {
-        ksleep(pid);
+        ksleep(rpid);
     }
 }
